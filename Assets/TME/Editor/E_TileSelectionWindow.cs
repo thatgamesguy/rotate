@@ -96,7 +96,7 @@ public class E_TileSelectionWindow : EditorWindow
 
 			var cEvent = Event.current;
 			Vector2 mousePos = new Vector2 (cEvent.mousePosition.x, cEvent.mousePosition.y);
-			if (cEvent.type == EventType.mouseDown && cEvent.button == 0) {
+			if (cEvent.type == EventType.MouseDown && cEvent.button == 0) {
 				currentSelection.x = Mathf.Floor ((mousePos.x + scrollPosition.x) / tile.x);
 				currentSelection.y = Mathf.Floor ((mousePos.y + scrollPosition.y) / tile.y);
 
