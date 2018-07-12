@@ -6,77 +6,80 @@ using UnityEngine.UI;
 
 public class LevelTimer : MonoBehaviour
 {
-	public Text text;
-	public float timerStart = 10f;
+    public Text text;
+    public float timerStart = 10f;
 
-	public Action onTimerFinished;
+    public Action onTimerFinished;
 
-	private string emptyTime;
-	private float currentTime = 0f;
-	private bool shouldUpdate = false;
-	private TimeSpan timeSpan;
+    private string emptyTime;
+    private float currentTime = 0f;
+    private bool shouldUpdate = false;
+    private TimeSpan timeSpan;
 
-	// Use this for initialization
-	void Start ()
-	{
-		timeSpan = TimeSpan.FromSeconds (timerStart);
-		UpdateTimeUI ();
-		emptyTime = text.text;
-	}
+    // Use this for initialization
+    void Start()
+    {
+        timeSpan = TimeSpan.FromSeconds(timerStart);
+        UpdateTimeUI();
+        emptyTime = text.text;
+    }
 
 	public void StartTimer()
-	{
-		shouldUpdate = true;
-	}
-		
-	public void ResetTimer ()
-	{
-		currentTime = timerStart;
-		text.text = emptyTime;
-	}
+    {
+        shouldUpdate = true;
+    }
 
-	public void StopTimer ()
-	{
-		shouldUpdate = false;
-	}
+    public void ResetTimer()
+    {
+        currentTime = timerStart;
+        text.text = emptyTime;
+    }
 
-	public double GetTimeInSeconds()
-	{
-		return timerStart - timeSpan.TotalSeconds;
-	}
+    public void StopTimer()
+    {
+        shouldUpdate = false;
+    }
 
-	public float GetTimeRemainder()
-	{
-		return timerStart - (float)GetTimeInSeconds ();
-	}
+    public double GetTimeInSeconds()
+    {
+        return timerStart - timeSpan.TotalSeconds;
+    }
 
-	void Update ()
-	{
-		if (!shouldUpdate) {
-			return;
-		}
+    public float GetTimeRemainder()
+    {
+        return timerStart - (float)GetTimeInSeconds();
+    }
 
-		currentTime -= Time.deltaTime;
+    void Update()
+    {
+        if (!shouldUpdate)
+        {
+            return;
+        }
 
-		if (currentTime <= 0f) {
-			if (onTimerFinished != null) {
-				onTimerFinished ();
-			}
+        currentTime -= Time.deltaTime;
 
-			print ("Time Up");
+        if (currentTime <= 0f)
+        {
+            if (onTimerFinished != null)
+            {
+                onTimerFinished();
+            }
 
-			currentTime = 0f;
-			shouldUpdate = false;
-		}
+            print("Time Up");
 
-		timeSpan = TimeSpan.FromSeconds (currentTime);
-	
-		UpdateTimeUI ();
-	
-	}
+            currentTime = 0f;
+            shouldUpdate = false;
+        }
 
-	private void UpdateTimeUI()
-	{
-		text.text = string.Format ("{0:00}:{1:00}", timeSpan.Seconds, timeSpan.Milliseconds / 10);
-	}
+        timeSpan = TimeSpan.FromSeconds(currentTime);
+
+        UpdateTimeUI();
+
+    }
+
+    private void UpdateTimeUI()
+    {
+        text.text = string.Format("{0:00}:{1:00}", timeSpan.Seconds, timeSpan.Milliseconds / 10);
+    }
 }

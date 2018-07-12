@@ -13,23 +13,40 @@ public class ShrinkGrowOverTime : MonoBehaviour
     public float delayToStartScalingUp = 0f;
 
     private bool isScaling = true;
+    private Vector2 initialScale;
+    private bool shouldBeScalingUp;
 
-
-    void OnEnable()
+    void Start()
     {
+        initialScale = Vector2.one;
+        shouldBeScalingUp = isScalingUp;
+    }
+
+	void OnEnable()
+	{
+        transform.localScale = initialScale;
+        isScalingUp = shouldBeScalingUp;
         isScaling = true;
+
         StartCoroutine(DoScale());
-    }
+	}
 
-    void OnDisable()
-    {
+	void OnDisable()
+	{
         isScaling = false;
-    }
+        StopCoroutine(DoScale());
+	}
 
-
-    private IEnumerator DoScale()
+	private IEnumerator DoScale()
     {
-        yield return new WaitForSeconds(delayToStartScalingDown);
+        if (isScalingUp)
+        {
+            yield return new WaitForSeconds(delayToStartScalingUp);
+        }
+        else
+        {
+            yield return new WaitForSeconds(delayToStartScalingDown);
+        }
 
         while (isScaling)
         {
@@ -73,14 +90,16 @@ public class ShrinkGrowOverTime : MonoBehaviour
     {
         if (other.gameObject.CompareTag(Tags.Player))
         {
-
             if (isScalingUp)
             {
-                var heading = other.transform.position - transform.position;
+                var playerPos = other.transform.position;
+                var cubePos = transform.position;
+
+                var heading =  playerPos - cubePos;
                 var dist = heading.magnitude;
                 var dir = heading / dist;
 
-                other.gameObject.GetComponent<Rigidbody2D>().AddForce(heading.normalized * 100f);
+                other.gameObject.GetComponent<Rigidbody2D>().AddForce(dir * 100f);
             }
         }
     }

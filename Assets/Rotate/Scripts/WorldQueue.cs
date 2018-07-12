@@ -2,75 +2,88 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldQueue : MonoBehaviour 
+public class WorldQueue : MonoBehaviour
 {
-	public World[] worlds;
+    public World[] worlds;
 
-	private static readonly string worldIndexKey = "WorldIndex";
+    public World currentWorld { get { return worlds[currentWorldIndex]; } }
 
-	private Leaderboard leaderboard;
-	private int currentWorld;
+    private static readonly string worldIndexKey = "WorldIndex";
 
-	void Awake()
-	{
-		leaderboard = FindObjectOfType<Leaderboard> ();
-	}
+    private Leaderboard leaderboard;
+    private int currentWorldIndex;
 
-	void Start () 
-	{
-		foreach (var world in worlds) {
-			world.gameObject.SetActive (false);
-		}
-		
-		currentWorld = PlayerPrefs.GetInt (worldIndexKey, 0);
+    void Awake()
+    {
+        leaderboard = FindObjectOfType<Leaderboard>();
+    }
 
-		worlds [currentWorld].GetComponentInChildren<Goal> ().onWorldComplete += IncrementWorld;
-		worlds [currentWorld].gameObject.SetActive (true);
-		worlds [currentWorld].StartWorld ();
-	}
+    void Start()
+    {
+        foreach (var world in worlds)
+        {
+            world.gameObject.SetActive(false);
+        }
 
-	private void IncrementWorld()
-	{
-		worlds [currentWorld].GetComponentInChildren<Goal> ().onWorldComplete -= IncrementWorld;
-		worlds [currentWorld].gameObject.SetActive (false);
+        currentWorldIndex = PlayerPrefs.GetInt(worldIndexKey, 0);
 
-		if (RecordCurrentWorldTime ()) {
-			RecordRemainingTime ();
-		}
+        if(currentWorldIndex > worlds.Length - 1)
+        {
+            currentWorldIndex = 0;
+        }
 
-		currentWorld = (currentWorld + 1) % worlds.Length;
+        worlds[currentWorldIndex].GetComponentInChildren<Goal>().onWorldComplete += IncrementWorld;
+        worlds[currentWorldIndex].gameObject.SetActive(true);
+        worlds[currentWorldIndex].StartWorld();
+    }
 
-		if (currentWorld == 0) {
-			Debug.Log ("All levels complete!");
-			return;
-		}
+    private void IncrementWorld()
+    {
+        worlds[currentWorldIndex].GetComponentInChildren<Goal>().onWorldComplete -= IncrementWorld;
+        worlds[currentWorldIndex].gameObject.SetActive(false);
 
-		worlds [currentWorld].GetComponentInChildren<Goal> ().onWorldComplete += IncrementWorld;
-		worlds [currentWorld].gameObject.SetActive (true);
-		worlds [currentWorld].StartWorld ();
-	}
+        if (RecordCurrentWorldTime())
+        {
+            RecordRemainingTime();
+        }
 
-	private bool RecordCurrentWorldTime()
-	{
-		float roundTimeSecs = worlds [currentWorld].GetCompleteTime ();
+        currentWorldIndex = (currentWorldIndex + 1) % worlds.Length;
 
-		var currentRecord = leaderboard.GetToken (currentWorld);
+        if (currentWorldIndex == 0)
+        {
+            Debug.Log("All levels complete!");
+            return;
+        }
 
-		currentRecord.UpdateTime (roundTimeSecs);
+        PlayerPrefs.SetInt(worldIndexKey, currentWorldIndex);
 
-		if (currentRecord.hasBeenUpdated) {
-			leaderboard.StoreToken (currentRecord);
-			return true;
-		}
+        worlds[currentWorldIndex].GetComponentInChildren<Goal>().onWorldComplete += IncrementWorld;
+        worlds[currentWorldIndex].gameObject.SetActive(true);
+        worlds[currentWorldIndex].StartWorld();
+    }
 
-		return false;
-	}
+    private bool RecordCurrentWorldTime()
+    {
+        float roundTimeSecs = worlds[currentWorldIndex].GetCompleteTime();
 
-	private void RecordRemainingTime()
-	{
-		float remainingTime = worlds [currentWorld].GetTimeRemainder ();
+        var currentRecord = leaderboard.GetToken(currentWorldIndex);
 
-		print ("Store remaining time of " + remainingTime);
-	}
-		
+        currentRecord.UpdateTime(roundTimeSecs);
+
+        if (currentRecord.hasBeenUpdated)
+        {
+            leaderboard.StoreToken(currentRecord);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void RecordRemainingTime()
+    {
+        float remainingTime = worlds[currentWorldIndex].GetTimeRemainder();
+
+        print("Store remaining time of " + remainingTime);
+    }
+
 }

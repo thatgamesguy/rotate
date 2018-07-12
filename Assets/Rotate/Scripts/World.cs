@@ -10,6 +10,7 @@ public class World : MonoBehaviour
     private Transform entry;
     private RotateWorld rotation;
     private Teleport[] teleports;
+    private ShrinkGrowOverTime[] shrinkingTiles;
 
     void Awake()
     {
@@ -32,16 +33,20 @@ public class World : MonoBehaviour
         rotation = GetComponent<RotateWorld>();
 
         teleports = GetComponentsInChildren<Teleport>();
+
+        shrinkingTiles = GetComponentsInChildren<ShrinkGrowOverTime>();
     }
 
     void OnEnable()
     {
         player.onPlayerDeath += StartWorld;
+        timer.onTimerFinished += OnTimeUp;
     }
 
     void OnDisable()
     {
         player.onPlayerDeath -= StartWorld;
+        timer.onTimerFinished -= OnTimeUp;
     }
 
     public void StartWorld()
@@ -50,6 +55,16 @@ public class World : MonoBehaviour
         timer.ResetTimer();
 
         rotation.canRotate = false;
+
+        foreach(var s in shrinkingTiles)
+        {
+            s.gameObject.SetActive(false);
+        }
+
+        foreach (var s in shrinkingTiles)
+        {
+            s.gameObject.SetActive(true);
+        }
 
         rotation.Reset();
 
@@ -64,6 +79,8 @@ public class World : MonoBehaviour
                 t.Reset();
             }
         }
+
+     
 
         StartCoroutine(ScaleTeleport());
         StartCoroutine(SpawnPlayer());
@@ -116,9 +133,17 @@ public class World : MonoBehaviour
 
         player.Enable();
 
+        timer.ResetTimer();
         timer.StartTimer();
 
         rotation.canRotate = true;
+    }
+
+    private void OnTimeUp()
+    {
+        timer.StopTimer();
+        timer.ResetTimer();
+        player.onPlayerDeath();
     }
 
 
