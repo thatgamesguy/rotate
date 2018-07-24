@@ -56,21 +56,16 @@ public class World : MonoBehaviour
 
         rotation.canRotate = false;
 
-        foreach(var s in shrinkingTiles)
-        {
-            s.gameObject.SetActive(false);
-        }
-
-        foreach (var s in shrinkingTiles)
-        {
-            s.gameObject.SetActive(true);
-        }
-
         rotation.Reset();
 
         player.Disable();
 
         entry.transform.position = player.transform.position;
+
+        foreach (var s in shrinkingTiles)
+        {
+            s.Reset();
+        }
 
         if (teleports != null && teleports.Length > 0)
         {
@@ -81,7 +76,6 @@ public class World : MonoBehaviour
         }
 
      
-
         StartCoroutine(ScaleTeleport());
         StartCoroutine(SpawnPlayer());
     }
@@ -137,6 +131,11 @@ public class World : MonoBehaviour
         timer.StartTimer();
 
         rotation.canRotate = true;
+
+        foreach (var s in shrinkingTiles)
+        {
+            s.StartShrinking();
+        }
     }
 
     private void OnTimeUp()

@@ -18,19 +18,23 @@ public class WorldQueue : MonoBehaviour
         leaderboard = FindObjectOfType<Leaderboard>();
     }
 
-    void Start()
+    public void StartWorlds()
     {
         foreach (var world in worlds)
         {
             world.gameObject.SetActive(false);
         }
 
+        /*
         currentWorldIndex = PlayerPrefs.GetInt(worldIndexKey, 0);
 
-        if(currentWorldIndex > worlds.Length - 1)
+        if (currentWorldIndex > worlds.Length - 1)
         {
             currentWorldIndex = 0;
         }
+        */
+
+        currentWorldIndex = 0;
 
         worlds[currentWorldIndex].GetComponentInChildren<Goal>().onWorldComplete += IncrementWorld;
         worlds[currentWorldIndex].gameObject.SetActive(true);

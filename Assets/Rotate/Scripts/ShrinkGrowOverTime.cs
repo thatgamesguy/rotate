@@ -13,31 +13,30 @@ public class ShrinkGrowOverTime : MonoBehaviour
     public float delayToStartScalingUp = 0f;
 
     private bool isScaling = true;
-    private Vector2 initialScale;
     private bool shouldBeScalingUp;
 
     void Start()
     {
-        initialScale = Vector2.one;
         shouldBeScalingUp = isScalingUp;
     }
 
-	void OnEnable()
-	{
-        transform.localScale = initialScale;
+    public void StartShrinking()
+    {
+        transform.localScale = Vector2.one;
         isScalingUp = shouldBeScalingUp;
         isScaling = true;
 
         StartCoroutine(DoScale());
-	}
+    }
 
-	void OnDisable()
-	{
+    public void Reset()
+    {
         isScaling = false;
         StopCoroutine(DoScale());
-	}
+        transform.localScale = Vector2.one;
+    }
 
-	private IEnumerator DoScale()
+    private IEnumerator DoScale()
     {
         if (isScalingUp)
         {
@@ -95,7 +94,7 @@ public class ShrinkGrowOverTime : MonoBehaviour
                 var playerPos = other.transform.position;
                 var cubePos = transform.position;
 
-                var heading =  playerPos - cubePos;
+                var heading = playerPos - cubePos;
                 var dist = heading.magnitude;
                 var dir = heading / dist;
 
